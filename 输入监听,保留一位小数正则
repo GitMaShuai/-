@@ -1,0 +1,64 @@
+        //EditText监听器
+        etValue.addTextChangedListener(new TextWatcher() {
+            private int selectionStart;
+            private int selectionEnd;
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                selectionStart = etValue.getSelectionStart();
+                selectionEnd = etValue.getSelectionEnd();
+
+                //删除多余输入的字（不会显示出来）
+                if (!isOnlyPointNumber(etValue.getText().toString()) && s.length() > 0) {
+                    s.delete(selectionStart - 1, selectionEnd);
+                    etValue.setText(s);
+                    etValue.setSelection(s.length());
+                }
+                //输入范围小于100(0.0-99.9)提示-------主要控制三位数内
+                if (!TextUtils.isEmpty(etValue.getText().toString())) {
+                    float v = Float.parseFloat(etValue.getText().toString());
+                    if (v>99.9f) {
+                        s.delete(selectionStart - 1, selectionEnd);
+                        etValue.setText(s);
+                        etValue.setSelection(s.length());
+                        MToast.showToast("输入范围小于100");
+                    }
+                }
+                //输入禁止多个零
+//                if (etValue.getText().toString().indexOf("0", etValue.getText().toString().indexOf("0") + 1) > 0
+//                        && !etValue.getText().toString().contains(".")) {
+//                    s.delete(selectionStart - 1, selectionEnd);
+//                    etValue.setText(s);
+//                    etValue.setSelection(s.length());
+//               }
+                //输入禁止零开头(0024.0)
+                if (etValue.getText().toString().startsWith("0")&&etValue.getText().toString().compareTo("0.9")>0) {
+                    s.delete(0, 1);
+                    etValue.setText(s);
+                    etValue.setSelection(s.length());
+                }
+            }
+        });
+        
+     /**
+     *      * 保留1位小数正则
+     *      *
+     *      * @param number
+     *      * @return
+     *      
+     */
+    public static boolean isOnlyPointNumber(String number) {
+        Pattern pattern = Pattern.compile("^\\d+\\.?\\d{0,1}$");
+        Matcher matcher = pattern.matcher(number);
+        return matcher.matches();
+    }
